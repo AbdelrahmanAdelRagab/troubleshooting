@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Troubleshooting Guide</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            color: #333;
+        }
+        h1 {
+            color: #000000;
+            font-weight: bold;
+        }
+        .header {
+            background: linear-gradient(135deg, #053570 0%, #0073e6 100%);
+            padding: 30px 20px;
+            color: white;
+            text-align: center;
+            border-bottom: 3px solid #ff7f0e;
+        }
+        .main-content {
+            min-height: 70vh;
+            padding: 40px 0;
+        }
+        .footer {
+            background: #333;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+        .info-card {
+            display: none;
+            transition: all 0.3s ease;
+        }
+        .dropdown-label {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        .card-header {
+            background: #0073e6;
+            color: white;
+        }
+        .card-body {
+            background: #ffffff;
+        }
+        .footer a {
+            color: #ff7f0e;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        .btn-custom {
+            background-color: #0073e6;
+            color: white;
+            font-weight: bold;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #005bb5;
+        }
+    </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+    <!-- Header -->
+    <header class="header">
+        <h1>Device Troubleshooting Guide</h1>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content flex-grow-1">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <!-- Primary Dropdown -->
+                    <div class="mb-4">
+                        <label for="primaryDropdown" class="dropdown-label">Select Device Category</label>
+                        <select class="form-select" id="primaryDropdown">
+                            <option value="" selected>Choose a category...</option>
+                            <option value="modem">Modem Troubleshooting</option>
+                            <option value="cableBox">Cable Box Troubleshooting</option>
+                            <option value="streamBox">Stream Box Troubleshooting</option>
+                            <option value="gateway">Gateway (Modem-Router Combo) Troubleshooting</option>
+                            <option value="extender">Extender Troubleshooting</option>
+                        </select>
+                    </div>
+
+                    <!-- Secondary Dropdown -->
+                    <div class="mb-4">
+                        <label for="secondaryDropdown" class="dropdown-label">Choose Device Model</label>
+                        <select class="form-select" id="secondaryDropdown" style="display:none;">
+                            <option value="" selected>Select a device...</option>
+                        </select>
+                    </div>
+
+                    <!-- Information Card -->
+                    <div class="card info-card shadow-sm" id="infoCard">
+                        <div class="card-header">
+                            <h3 class="card-title h5 mb-0" id="deviceName"></h3>
+                        </div>
+                        <div class="card-body">
+                            <pre id="deviceInfo"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer mt-auto">
+        <div class="container">
+            <p class="mb-0">
+                <a href="mailto:abdelrahman.ahmedadelzakiragab@alticeusa.com?subject=Updates Idea">Email me your updates</a> | Made by Abdelrahman Ragab
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Troubleshooting data
+        const troubleshootingData = {
+            modem: {
+                ubc1301: {
+                    name: "Ubee UBC1301 (DOCSIS 3.1), U10C035 (DOCSIS 2.0)",
+                    info: `Reboot: Unplug the modem from the power outlet. Wait 10 seconds and plug it back in.
+
+Status Lights:
+- Power: Solid green (OK), blinking means it's starting up
+- Online/Internet: Solid green (connected), blinking means it's trying to connect
+- Wi-Fi (if applicable): Should be solid if connected; if blinking, there might be an issue
+
+Factory Reset: Press and hold the reset button for 10 seconds with a paperclip until the lights flash.
+
+Manual Troubleshooting:
+- Check all cables and make sure everything is plugged in tightly
+- If no internet, check for service outages
+- Perform a speed test to check connection speed`
+                },
+                arris: {
+                    name: "Arris SB6183, SB6190, SB8200 (DOCSIS 3.0/3.1)",
+                    info: `Reboot: Unplug for 10 seconds, plug back in.
+
+Status Lights:
+- Power: Solid green
+- Downstream: Blinking means connecting; solid means connected
+- Upstream: Same as downstream
+- Online: Solid when connected
+
+Factory Reset: Press the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Check the coaxial cable for any damage
+- Run a speed test to ensure you're getting the expected speeds
+- Test connection with different devices to see if the issue is with a specific device`
+                },
+                motorola: {
+                    name: "Motorola MB7621, MB8600 (DOCSIS 3.0/3.1)",
+                    info: `Reboot: Unplug, wait 10 seconds, plug back in.
+
+Status Lights:
+- Power: Solid green
+- Downstream/Upstream: Should be solid if connected
+- Online: Solid when connected to the internet
+
+Factory Reset: Use a paperclip to press the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- If no connection, check if your ISP is down in your area
+- Test speeds using a device connected directly to the modem
+- Try a different coaxial cable if there's no signal`
+                },
+                netgear: {
+                    name: "Netgear CM500, CM600, CM700 (DOCSIS 3.0)",
+                    info: `Reboot: Unplug, wait, and plug back in.
+
+Status Lights:
+- Power: Solid green when on
+- Internet: Solid green when working; blinking means no connection
+
+Factory Reset: Press and hold the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Check if the internet light is solid green
+- Try connecting with a different Ethernet cable
+- Check for any firmware updates`
+                }
+            },
+            cableBox: {
+                samsung: {
+                    name: "Samsung SMT-C5320 (HD Cable Box), GX-SM530CF (HD Box with DVR Options)",
+                    info: `Reboot: Unplug the cable box for 10 seconds, then plug it back in.
+
+Status Lights:
+- Power: Should be solid when on
+- Record: Blinking when recording
+- Channel Info: Shows channel or program info
+
+Factory Reset: Unplug, then press and hold the "Reset" button on the box.
+
+Manual Troubleshooting:
+- Check connections to the TV and the wall
+- If screen is blank, check for any service outages
+- Try swapping out HDMI cables if the picture isn't clear`
+                },
+                cisco: {
+                    name: "Scientific Atlanta / Cisco Explorer (8300HD, 4200, 4250HD)",
+                    info: `Reboot: Unplug, wait, and plug back in.
+
+Status Lights:
+- Power: Solid when on
+- Record: Blinking when recording
+- Channel: Shows the current channel
+
+Factory Reset: Press and hold the "Reset" button or follow the on-screen instructions.
+
+Manual Troubleshooting:
+- Ensure HDMI and coaxial cables are connected
+- If no picture, check if the box is set to the correct HDMI input
+- Re-scan channels if missing`
+                },
+                alticeOne: {
+                    name: "Altice One (Integrated Modem/Router + Cable Box)",
+                    info: `Reboot: Unplug and plug back in after 10 seconds.
+
+Status Lights:
+- Power: Solid when working
+- Wi-Fi: Solid for active connection
+- Cable: Solid when connected to the cable network
+
+Factory Reset: Press and hold the reset button on the back of the Altice One.
+
+Manual Troubleshooting:
+- Make sure all wires are securely connected
+- Check if the internet is working by testing Wi-Fi or a wired connection`
+                }
+            },
+            streamBox: {
+                optimumStream: {
+                    name: "Optimum Stream 4K Android TV Box",
+                    info: `Reboot: Unplug the box for 10 seconds, plug back in.
+
+Status Lights:
+- Power: Solid when on
+- Wi-Fi/Internet: Should be solid when connected
+
+Factory Reset: Go to "Settings," find "Reset" under System, and follow prompts.
+
+Manual Troubleshooting:
+- Ensure your Wi-Fi connection is stable
+- Re-pair the remote if the box isn't responding
+- Check if there's a streaming service outage`
+                }
+            },
+            gateway: {
+                ubeeDVW32CB: {
+                    name: "Ubee DVW32CB (DOCSIS 3.0 Gateway)",
+                    info: `Reboot: Unplug for 10 seconds, plug back in.
+
+Status Lights:
+- Power: Solid green when on
+- Internet: Solid when connected
+- Wi-Fi: Solid for stable connection
+
+Factory Reset: Hold the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Check the cables for loose connections
+- Reboot the gateway and check if it reconnects to Wi-Fi
+- Test a wired connection to rule out Wi-Fi issues`
+                },
+                arrisGateway: {
+                    name: "Arris TG1672G, TG1682G, NVG443B (DOCSIS 3.0/3.1)",
+                    info: `Reboot: Unplug, wait 10 seconds, plug back in.
+
+Status Lights:
+- Power: Solid when on
+- Wi-Fi: Blinking when active
+- Online: Solid green when connected
+
+Factory Reset: Hold reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Check all connections and ensure everything is plugged in securely
+- Verify that the Wi-Fi network is active`
+                },
+                netgearGateway: {
+                    name: "Netgear C7000, C7800 (DOCSIS 3.1 Nighthawk)",
+                    info: `Reboot: Unplug the gateway for 10 seconds, plug back in.
+
+Status Lights:
+- Power: Solid green
+- Internet: Solid green when connected
+
+Factory Reset: Press and hold the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Make sure the cables are tight
+- Test connection speed with a computer or phone
+- Check if the firmware is up-to-date`
+                }
+            },
+            extender: {
+                alticeAmplify: {
+                    name: "Altice Amplify (Mesh System with Altice One)",
+                    info: `Reboot: Unplug and plug back in.
+
+Status Lights: Solid green means connected; blinking means it's searching.
+
+Factory Reset: Hold the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Ensure the extender is placed halfway between the router and the problem area
+- Reconnect devices to the extender's Wi-Fi`
+                },
+                arrisExtender: {
+                    name: "Arris VAP2500 (Wireless Extender)",
+                    info: `Reboot: Unplug for 10 seconds and plug back in.
+
+Status Lights: Solid green when working; blinking means connecting.
+
+Factory Reset: Hold the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Move the extender closer to the router to improve signal strength
+- Check the router's Wi-Fi settings if the extender won't connect`
+                },
+                netgearOrbi: {
+                    name: "Netgear Orbi & Eero Mesh Systems",
+                    info: `Reboot: Unplug, wait, and plug back in.
+
+Status Lights: Solid blue means connected, amber means weak connection.
+
+Factory Reset: Hold the reset button for 10-15 seconds.
+
+Manual Troubleshooting:
+- Check that the satellite is within range of the main router
+- Re-pair the devices if the mesh system isn't working`
+                }
+            }
+        };
+
+        const primaryDropdown = document.getElementById('primaryDropdown');
+        const secondaryDropdown = document.getElementById('secondaryDropdown');
+        const infoCard = document.getElementById('infoCard');
+        const deviceNameElement = document.getElementById('deviceName');
+        const deviceInfoElement = document.getElementById('deviceInfo');
+
+        primaryDropdown.addEventListener('change', function() {
+            const selectedCategory = this.value;
+            secondaryDropdown.style.display = selectedCategory ? 'block' : 'none';
+            infoCard.style.display = 'none';
+            
+            secondaryDropdown.innerHTML = '<option value="" selected>Choose a device...</option>';
+            
+            if (selectedCategory) {
+                const devices = troubleshootingData[selectedCategory];
+                for (const key in devices) {
+                    const option = document.createElement('option');
+                    option.value = key;
+                    option.textContent = devices[key].name;
+                    secondaryDropdown.appendChild(option);
+                }
+            }
+        });
+
+        secondaryDropdown.addEventListener('change', function() {
+            const selectedCategory = primaryDropdown.value;
+            const selectedDevice = this.value;
+            
+            if (selectedDevice) {
+                const device = troubleshootingData[selectedCategory][selectedDevice];
+                deviceNameElement.textContent = device.name;
+                deviceInfoElement.textContent = device.info;
+                infoCard.style.display = 'block';
+            } else {
+                infoCard.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
